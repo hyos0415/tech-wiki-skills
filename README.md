@@ -23,7 +23,7 @@ Claude Code용 개인 스킬 모음. tech-wiki-vault 스타일 vault(`raw/` → 
 ## 새 컴퓨터에서 쓰는 법
 
 ```bash
-git clone <이 저장소 URL> ~/claude-skills
+git clone https://github.com/hyos0415/tech-wiki-skills.git ~/claude-skills
 ```
 
 그 다음 `~/.claude/skills/` 아래에 각 스킬을 가리키는 **NTFS 접합점(junction)**을 만든다(심볼릭 링크는 관리자 권한/개발자 모드가 필요해서 번거로울 수 있어 junction을 쓴다). PowerShell에서:
