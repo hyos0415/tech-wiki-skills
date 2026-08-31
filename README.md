@@ -9,8 +9,9 @@ Claude Code용 개인 스킬 모음. tech-wiki-vault 스타일 vault(`raw/` → 
 | `tech-research-card` | 0단계(원문 저장+태깅) + 1~2단계(깊이 게이트 분류 → 카드 생성) |
 | `tech-research-card-blog` | 3단계: 카드 → 블로그 초안 승격 |
 | `tech-wiki-factcheck` | 4단계: 블로그 초안의 문헌조사 수치·벤치마크 재검증 |
+| `blog-draft-structure` | 사람이 직접 쓴 **평문** 블로그 초안에 위계를 부여 — 구간 나누기, 소제목 위치·문구 후보, 리스트/표 후보, 시각 자료 슬롯 (본문 문장은 수정하지 않음) |
 | `tech-wiki-audit` | vault 디렉토리 구조가 `CLAUDE.md` 규칙에서 벗어났는지 감사 |
-| `tech-wiki-pipeline` | 위 4개 + `humanize-korean`(별도 플러그인)을 순서대로 위임하는 오케스트레이터. 원문단계 팩트체크(신규 로직)도 여기 있음 |
+| `tech-wiki-pipeline` | 위 스킬 중 4개(`blog-draft-structure` 제외) + `humanize-korean`(별도 플러그인)을 순서대로 위임하는 오케스트레이터. 원문단계 팩트체크(신규 로직)도 여기 있음 |
 
 각 스킬 폴더의 `SKILL.md`가 실제 지침이다. `tech-wiki-pipeline`은 얇은 래퍼라서 나머지 로직을 복붙하지 않는다 — 각 하위 스킬을 고치면 파이프라인 전체에 자동 반영된다.
 
@@ -29,7 +30,7 @@ git clone https://github.com/hyos0415/tech-wiki-skills.git ~/claude-skills
 그 다음 `~/.claude/skills/` 아래에 각 스킬을 가리키는 **NTFS 접합점(junction)**을 만든다(심볼릭 링크는 관리자 권한/개발자 모드가 필요해서 번거로울 수 있어 junction을 쓴다). PowerShell에서:
 
 ```powershell
-$skills = @('tech-research-card','tech-research-card-blog','tech-wiki-factcheck','tech-wiki-audit','tech-wiki-pipeline')
+$skills = @('tech-research-card','tech-research-card-blog','tech-wiki-factcheck','tech-wiki-audit','tech-wiki-pipeline','blog-draft-structure')
 foreach ($name in $skills) {
     New-Item -ItemType Junction -Path "$HOME\.claude\skills\$name" -Target "$HOME\claude-skills\$name"
 }
@@ -38,7 +39,7 @@ foreach ($name in $skills) {
 macOS/Linux라면 junction 대신 `ln -s`(심볼릭 링크)를 쓴다:
 
 ```bash
-for name in tech-research-card tech-research-card-blog tech-wiki-factcheck tech-wiki-audit tech-wiki-pipeline; do
+for name in tech-research-card tech-research-card-blog tech-wiki-factcheck tech-wiki-audit tech-wiki-pipeline blog-draft-structure; do
   ln -s "$HOME/claude-skills/$name" "$HOME/.claude/skills/$name"
 done
 ```
