@@ -35,6 +35,8 @@ flowchart LR
 | `blog-draft-structure` | 사람이 직접 쓴 **평문** 초안에 헤딩 위계·표·이미지 슬롯을 제안 (본문 문장은 건드리지 않음) |
 | `tech-wiki-audit` | vault 구조가 `CLAUDE.md` 규칙에서 벗어났는지 감사 (최상위 문서, flat 구조, 깨진 링크 등) |
 | `tech-wiki-pipeline` | 위 스킬(`blog-draft-structure` 제외)과 `humanize-korean`을 순서대로 호출하는 오케스트레이터 |
+| `tistory-publish` | (선택) 초안을 티스토리 발행용 사본과 매니페스트로 변환하고, 구조가 안 깨졌는지 스크립트로 대조 |
+| `tistory-publish-browser` | (선택) 매니페스트를 읽어 크롬에서 티스토리 에디터에 올리고 비공개 저장·렌더링 확인 |
 
 각 스킬 폴더의 `SKILL.md`가 실제 지침입니다. `tech-wiki-pipeline`은 얇은 래퍼라서 하위 스킬의 로직을 복사해 두지 않습니다. 하위 스킬을 고치면 파이프라인에도 그대로 반영됩니다.
 
@@ -106,7 +108,7 @@ macOS/Linux:
 
 ```bash
 mkdir -p ~/.claude/skills
-for name in tech-research-card tech-research-card-blog tech-wiki-factcheck tech-wiki-audit tech-wiki-pipeline blog-draft-structure; do
+for name in tech-research-card tech-research-card-blog tech-wiki-factcheck tech-wiki-audit tech-wiki-pipeline blog-draft-structure tistory-publish; do
   ln -s "$HOME/claude-skills/$name" "$HOME/.claude/skills/$name"
 done
 ```
@@ -114,12 +116,14 @@ done
 Windows (PowerShell, 관리자 권한이 필요 없는 junction 사용):
 
 ```powershell
-$skills = @('tech-research-card','tech-research-card-blog','tech-wiki-factcheck','tech-wiki-audit','tech-wiki-pipeline','blog-draft-structure')
+$skills = @('tech-research-card','tech-research-card-blog','tech-wiki-factcheck','tech-wiki-audit','tech-wiki-pipeline','blog-draft-structure','tistory-publish')
 New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
 foreach ($name in $skills) {
     New-Item -ItemType Junction -Path "$HOME\.claude\skills\$name" -Target "$HOME\claude-skills\$name"
 }
 ```
+
+티스토리에 안 올릴 거면 `tistory-publish`는 빼도 됩니다. `tistory-publish-browser`는 Claude in Chrome용이라 위 목록에 넣지 않았습니다(아래 제약 참고).
 
 ### 3. vault 만들기
 
@@ -173,6 +177,8 @@ Claude Code를 vault 폴더에서 열고 이렇게 요청하면 됩니다.
 - **다이어그램 스킬 의존**: `tech-research-card-blog`와 `blog-draft-structure`는 다이어그램 슬롯을 만나면 다이어그램 스킬로 그리려고 시도합니다. 그런 스킬이 없는 환경에서는 `{이미지: ...}` 슬롯만 남고, 그림은 직접 그려야 합니다.
 - **humanize-korean과 Python**: 휴머나이즈 단계는 Python이 있으면 정량 채점·결정적 게이트를 씁니다. Python이 없으면 수동 경로(진단 → 겨냥 윤문, 사람이 직접 대조 검토)로 넘어가도록 스킬 안에 안내가 있습니다.
 - **모델 지정**: 대부분의 스킬이 frontmatter에서 `model: sonnet`을 지정합니다. 처음엔 분류를 haiku로 돌렸는데, "핵심전제 vs 비교 필수 대상" 같은 경계 판단에서 정확도가 떨어져 올렸습니다.
+- **티스토리 스킬은 작성자 블로그 기준**: `tistory-publish`는 변환 스크립트(`scripts/make_post.py`)에 Python이 필요합니다. `tistory-publish-browser`는 Claude in Chrome 환경에서만 동작하고, description에 작성자 블로그 주소가 들어 있으니 본인 주소로 바꿔서 쓰세요. 표·mermaid 렌더링은 작성자가 따로 패치한 스킨을 전제로 하며, 그 스킨 코드는 이 저장소에 없습니다.
+- **블로그 구조 레퍼런스(선택)**: `blog-draft-structure`는 vault에 `Templates/블로그-구조-레퍼런스.md`(기존 발행 글에서 잰 문단 길이·섹션 스타일 수치)가 있으면 먼저 읽습니다. 없으면 이 단계를 건너뛰고 그 사실을 보고합니다.
 - **한국어 전용**: 지침, 템플릿, 문체 규칙이 모두 한국어 블로그 기준입니다.
 
 ## 수정할 때 원칙
