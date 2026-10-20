@@ -1,0 +1,20 @@
+# Obsidian UI 상태
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/graph.json
+
+# 로컬 플러그인/테마
+.obsidian/plugins/
+.obsidian/themes/
+
+# OS 파일
+.DS_Store
+Thumbs.db
+
+# 백업
+*.bak
+*.tmp
+
+# Scratch는 임시 작업공간 — vault에는 남기되 git 이력에는 안 남김
+Scratch/*
+!Scratch/.gitkeep
